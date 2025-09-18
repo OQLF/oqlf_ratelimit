@@ -4,6 +4,7 @@
 
 ## What does it do?
 This extension allows you to set global and per IP group limits on how many times a resource can be requested in a configurable timeframe. When this limit is reached, the clients receive a `429 Too Many Requests` and a `Retry-After:` header telling them to cool down and retry at a slower pace.
+
 [Rate limiting with 429 Too Many Requests](https://developer.mozilla.org/en-US/docs/Glossary/Rate_limit)
 
 ## Why was this extension created?
@@ -28,6 +29,7 @@ which will limit requests for:
 - https:∕∕www.example.com/**sitemap.xml**
 - https:∕∕www.example.com/**sitemap.xml**/anything
 - https:∕∕www.example.com/**sitemap.xml**?page=12
+
 ![Page limit setup](Resources/Public/Page_limit.png)
 
 ## Requirements
