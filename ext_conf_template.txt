@@ -1,0 +1,84 @@
+# customcategory=page1=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:category.page1
+
+# customcategory=page2=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:category.page2
+
+# customcategory=page3=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:category.page3
+
+# customcategory=page4=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:category.page4
+
+# customsubcategory=page5=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:category.page5
+
+
+# cat=basic/enable/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.redis_server
+redisServer =
+
+# cat=basic/enable/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.redis_server_port
+port = 6379
+
+pages {
+	0 {
+		# cat=page1/links/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.pageToLimit
+		path = 
+
+		# cat=page1/enable/a; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.time_period
+		time_period = 10
+
+		# cat=page1/enable/b; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit
+		max_calls_limit = 5
+
+		# cat=page1/enable/c; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit_ip
+		max_calls_limit_ip = 3
+	}
+	1 {
+		# cat=page2/links/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.pageToLimit
+		path = 
+
+		# cat=page2/enable/a; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.time_period
+		time_period = 10
+
+		# cat=page2/enable/b; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit
+		max_calls_limit = 5
+
+		# cat=page2/enable/c; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit_ip
+		max_calls_limit_ip = 3
+	}
+	2 {
+		# cat=page3/links/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.pageToLimit
+		path = 
+
+		# cat=page3/enable/a; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.time_period
+		time_period = 10
+
+		# cat=page3/enable/b; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit
+		max_calls_limit = 5
+
+		# cat=page3/enable/c; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit_ip
+		max_calls_limit_ip = 3
+	}
+	3 {
+		# cat=page4/links/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.pageToLimit
+		path = 
+
+		# cat=page4/enable/a; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.time_period
+		time_period = 10
+
+		# cat=page4/enable/b; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit
+		max_calls_limit = 5
+
+		# cat=page4/enable/c; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit_ip
+		max_calls_limit_ip = 3
+	}
+	4 {
+		# cat=page5/links/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.pageToLimit
+		path = 
+
+		# cat=page5/enable/a; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.time_period
+		time_period = 10
+
+		# cat=page5/enable/b; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit
+		max_calls_limit = 5
+
+		# cat=page5/enable/c; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.max_calls_limit_ip
+		max_calls_limit_ip = 3
+	}
+}

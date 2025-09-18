@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" target-language="fr" datatype="plaintext" original="EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf" date="2025-05-27T14:06:47Z" product-name="oqlf_ratelimit">
+		<header/>
+		<body>
+			<trans-unit id="category.page1">
+				<source>Page 1</source>
+				<target>Page 1</target>
+			</trans-unit>
+			<trans-unit id="category.page2">
+				<source>Page 2</source>
+				<target>Page 2</target>
+			</trans-unit>
+			<trans-unit id="category.page3">
+				<source>Page 3</source>
+				<target>Page 3</target>
+			</trans-unit>
+			<trans-unit id="category.page4">
+				<source>Page 4</source>
+				<target>Page 4</target>
+			</trans-unit>
+			<trans-unit id="category.page5">
+				<source>Page 5</source>
+				<target>Page 5</target>
+			</trans-unit>
+			<trans-unit id="configuration.pageToLimit" approved="yes">
+				<target state="final">Début de l'URL à limiter : ne pas inclure le nom de domaine ni la barre oblique '/' initiale</target>
+			</trans-unit>
+			<trans-unit id="configuration.max_calls_limit" approved="yes">
+				<target state="final">Nombre maximal d'appel durant une période</target>
+			</trans-unit>
+			<trans-unit id="configuration.max_calls_limit_ip" approved="yes">
+				<target state="final">Nombre maximal d'appel durant une période pour un même groupe d'adresses IP : Le regroupement est fait sur les deux premiers octets de l'adresse, un groupe serait le réseau du client si tous les réseaux étaient de classe B</target>
+			</trans-unit>
+			<trans-unit id="configuration.time_period" approved="yes">
+				<target state="final">Durée d'une période en secondes</target>
+			</trans-unit>
+			<trans-unit id="configuration.redis_server" approved="yes">
+				<target state="final">Adresse du serveur redis</target>
+			</trans-unit>
+			<trans-unit id="configuration.redis_server_port" approved="yes">
+				<target state="final">Port du serveur redis</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

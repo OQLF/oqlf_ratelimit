@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2025-06-03T14:06:47Z" product-name="oqlf_ratelimit">
+		<header/>
+		<body>
+			<trans-unit id="category.page1">
+				<source>Page 1</source>
+			</trans-unit>
+			<trans-unit id="category.page2">
+				<source>Page 2</source>
+			</trans-unit>
+			<trans-unit id="category.page3">
+				<source>Page 3</source>
+			</trans-unit>
+			<trans-unit id="category.page4">
+				<source>Page 4</source>
+			</trans-unit>
+			<trans-unit id="category.page5">
+				<source>Page 5</source>
+			</trans-unit>
+			<trans-unit id="configuration.pageToLimit">
+				<source>Start of the URL to limit : Don't include domain or leading '/'</source>
+			</trans-unit>
+			<trans-unit id="configuration.max_calls_limit">
+				<source>Maximum number of call during a period</source>
+			</trans-unit>
+			<trans-unit id="configuration.max_calls_limit_ip">
+				<source>Maximum number of call during a period from a same IP group : The match is on the first two bytes of the ip address so an ip group is like the client "class B network" if every network was class B</source>
+			</trans-unit>
+			<trans-unit id="configuration.time_period">
+				<source>Lenght of a period in seconds</source>
+			</trans-unit>
+			<trans-unit id="configuration.redis_server">
+				<source>Address of the redis server</source>
+			</trans-unit>
+			<trans-unit id="configuration.redis_server_port">
+				<source>Port of the redis server</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

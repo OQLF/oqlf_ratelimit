@@ -1,0 +1,33 @@
+{
+    "name": "oqlf/oqlf_ratelimit",
+    "description": "Middleware limitting the number of requests over time a client can make",
+    "authors": [
+        {
+            "name": "Rémi Payette",
+            "email": "rpayette@oqlf.gouv.qc.ca",
+            "role": "Developer"
+        }
+    ],
+    "type": "typo3-cms-extension",
+    "license": [
+        "GPL-2.0-or-later"
+    ],
+    "require": {
+        "php": ">=7.0",
+        "typo3/cms-core": "^13.4"
+    },
+    "replace": {
+        "typo3-ter/oqlf_ratelimit": "self.version"
+    },
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "OQLF\\ratelimit\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "oqlf_ratelimit"
+        }
+    }
+}
