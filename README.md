@@ -24,8 +24,7 @@ All configuration is done in the Settings->Extension configuration module.
 Up to 5 different limited resources can be set. Leave the path field empty if unused.
 
 The path field will be matched against the start of the URL after the domain and the leading slash.
-example below : https:∕∕www.example.com/**sitemap.xml**
-which will limit requests for:
+example below match https:∕∕www.example.com/**sitemap.xml** which will limit requests for:
 - https:∕∕www.example.com/**sitemap.xml**
 - https:∕∕www.example.com/**sitemap.xml**/anything
 - https:∕∕www.example.com/**sitemap.xml**?page=12
@@ -36,4 +35,4 @@ which will limit requests for:
 
 As of now, I haven't tested on TYPO3 lower than v13, but I see no reason it wouldn't work on v12, maybe even v11 and v10. I'll update the requirements if I have returns from other users or have time to test myself sometime.
 
-It also requires a Redis or Valkey server, which you may already be using for the Typo3 cache. In this case, you can just use the same server.
+It also requires a Redis or Valkey server v7 or greater for both, which you may already be using for the Typo3 cache. In this case, you can just use the same server.
