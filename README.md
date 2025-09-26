@@ -23,8 +23,7 @@ All configuration is done in the Settings->Extension configuration module.
 ### Page limit setup
 Up to 5 different limited resources can be set. Leave the path field empty if unused.
 
-The path field will be matched against the start of the URL after the domain and the leading slash.
-example below match https:∕∕www.example.com/**sitemap.xml** which will limit requests for:
+The path field will be matched against the start of the URL after the domain and the leading slash. The example below match https:∕∕www.example.com/**sitemap.xml** which will limit requests for:
 - https:∕∕www.example.com/**sitemap.xml**
 - https:∕∕www.example.com/**sitemap.xml**/anything
 - https:∕∕www.example.com/**sitemap.xml**?page=12

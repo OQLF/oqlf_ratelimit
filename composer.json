@@ -1,6 +1,6 @@
 {
     "name": "oqlf/oqlf_ratelimit",
-    "description": "Middleware limitting the number of requests over time a client can make",
+    "description": "Typo3 middleware limitting the number of requests over time a client can make",
     "authors": [
         {
             "name": "Rémi Payette",
@@ -28,6 +28,12 @@
     "extra": {
         "typo3/cms": {
             "extension-key": "oqlf_ratelimit"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "typo3/cms-composer-installers": true,
+            "typo3/class-alias-loader": true
         }
     }
 }
