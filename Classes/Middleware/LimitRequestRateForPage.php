@@ -52,7 +52,11 @@ class LimitRequestRateForPage implements MiddlewareInterface
      */
     protected int $redisPort;
 
-
+    /**
+     * Addresses of clients not to limit
+     * @var array
+     */
+    protected array $ipExcludedFromRatelimit = [];
 
 
 
@@ -71,6 +75,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
 
         $this->redisServer = $extConfig['redisServer'];
         $this->redisPort = $extConfig['port'];
+        $this->ipExcludedFromRatelimit = explode(',', $extConfig['ipExcludedFromRatelimit']);
 
         if ( $this->redisServer && $this->redisPort > 0 && count($this->restrictedPages) > 0 ) {
             $this->isConfigured = true;
@@ -112,6 +117,11 @@ class LimitRequestRateForPage implements MiddlewareInterface
             $user_ip_address = $request->getServerParams()['HTTP_X_FORWARDED_FOR'];
         } else {
             $user_ip_address = $params->getRemoteAddress();
+        }
+
+        // if client is in the list of IPs not to restrict, proceed
+        if ( in_array($user_ip_address, $this->ipExcludedFromRatelimit) ) {
+            return $handler->handle($request);
         }
 
         // The user is identified by the first 2 number of it's IP address

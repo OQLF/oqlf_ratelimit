@@ -36,6 +36,9 @@
 			<trans-unit id="configuration.redis_server_port">
 				<source>Port of the redis server</source>
 			</trans-unit>
+			<trans-unit id="configuration.ipExcludedFromRatelimit">
+				<source>Comma separated list of IPs to exclude from all limits ( always allow ) : ex: 127.0.0.1</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
