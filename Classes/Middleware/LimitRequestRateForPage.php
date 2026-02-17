@@ -21,7 +21,7 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
  *
  * Users are differentiated by the first 2 number of their ip address as a (so-so) way of limiting cloud bots
  *
- * Based on https://www.digitalocean.com/community/tutorials/how-to-implement-php-rate-limiting-with-redis-on-ubuntu-20-04
+ * Inpired by https://www.digitalocean.com/community/tutorials/how-to-implement-php-rate-limiting-with-redis-on-ubuntu-20-04
  * 
  * @author Rémi Payette
  */
@@ -44,7 +44,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
      * Redis server to use
      * @var string
      */
-    protected string $redisServer;
+    protected string $redisHost;
 
     /**
      * Redis tcp port
@@ -58,7 +58,10 @@ class LimitRequestRateForPage implements MiddlewareInterface
      */
     protected array $ipExcludedFromRatelimit = [];
 
-
+    /**
+     * Redis server object
+     */
+    protected \Redis $redisServer;
 
     public function __construct(
         private readonly ExtensionConfiguration $extensionConfiguration,
@@ -73,23 +76,54 @@ class LimitRequestRateForPage implements MiddlewareInterface
             }
         }
 
-        $this->redisServer = $extConfig['redisServer'];
+        $this->redisHost = $extConfig['redisServer'];
         $this->redisPort = $extConfig['port'];
         $this->ipExcludedFromRatelimit = explode(',', $extConfig['ipExcludedFromRatelimit']);
 
-        if ( $this->redisServer && $this->redisPort > 0 && count($this->restrictedPages) > 0 ) {
+        if ( $this->redisHost && $this->redisPort > 0 && count($this->restrictedPages) > 0 ) {
             $this->isConfigured = true;
         }
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
+
+
+    /**
+     * Increment the hit count for a key
+     * @param  string $key      Key to increment
+     * @param  int    $limit    Number of times allowed in $duration period
+     * @param  int    $duration Time period in seconds a max of $limit hits are allowed
+     * @return bool             Is limit exceeded ?
+     */
+    protected function incAndTestRequestCountForKey ( string $key, int $limit, int $duration ): bool {
+        if (!$this->redisServer->exists($key)) {
+            $this->redisServer->set($key, 1);
+            $this->redisServer->expire($key, $duration);
+        } else {
+            // Reset expire if TTL = -1 ( no expiration ). This happens regularly for an unknown reason.
+            $this->redisServer->rawcommand("EXPIRE", $key, $duration, "NX");
+
+            if ($this->redisServer->INCR($key) > $limit) {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
         // If the extension isn't configured, proceed normally
         if ( $this->isConfigured === false ) {
             return $handler->handle($request);
         }        
 
         $params = $request->getAttribute('normalizedParams');
+
+        // If client is in the list of IPs not to restrict, proceed
+        if ( in_array($user_ip_address, $this->ipExcludedFromRatelimit) ) {
+            return $handler->handle($request);
+        }
 
         // Check if requested page match one of the limits
         $requestedPage = strtoupper( $params->getSiteScript() );
@@ -110,63 +144,53 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $max_calls_limit_ip = (int)$restriction["max_calls_limit_ip"];
         $max_calls_limit = (int)$restriction["max_calls_limit"];
 
-        $redis = new \Redis();
-        $redis->connect($this->redisServer, $this->redisPort);
+        $this->redisServer = new \Redis();
+        if ( $this->redisServer->connect($this->redisHost, $this->redisPort) == false ) {
+            error_log("oqlf_ratelimit: Redis server could not be reached");
 
-        if (!empty($request->getServerParams()['HTTP_X_FORWARDED_FOR'])) {
-            $user_ip_address = $request->getServerParams()['HTTP_X_FORWARDED_FOR'];
-        } else {
-            $user_ip_address = $params->getRemoteAddress();
-        }
-
-        // if client is in the list of IPs not to restrict, proceed
-        if ( in_array($user_ip_address, $this->ipExcludedFromRatelimit) ) {
+            // No Redis : proceed with the request without ratelimit
             return $handler->handle($request);
         }
 
-        // The user is identified by the first 2 number of it's IP address
-        $separator = '.';
-        $firstSeparatorPos = strpos($user_ip_address, $separator);
-        if ( $firstSeparatorPos === false ) {
-            // IPv6
-            $separator = ':';
-            $firstSeparatorPos = strpos($user_ip_address, $separator);
-        }
-        $secondSeparatorPos = strpos($user_ip_address, $separator, $firstSeparatorPos + 1);
+        /******
+        * OK, verifications are done, proceed with the actual limit logic
+        ******/
 
-        if ( $secondSeparatorPos !== false ) {
-            $userKey = "Limit-".$restriction["confNo"]."-".substr($user_ip_address, 0, $secondSeparatorPos );
+
+        if ( empty($params->getHttpReferer()) ) {
+            // If there is no referer, consider it's a single user
+            $userKey = "Limit-".$restriction["confNo"]."-noReferer";
         } else {
-            $userKey = "Limit-".$restriction["confNo"]."-generic";
+            // The user is identified by the first 2 number of it's IP address
+            // Typo3 handles HTTP_X_FORWARDED_FOR with reverse proxies in normalizedParams
+            $user_ip_address = $params->getRemoteAddress();
+
+            $separator = '.';
+            $firstSeparatorPos = strpos($user_ip_address, $separator);
+            if ( $firstSeparatorPos === false ) {
+                // IPv6
+                $separator = ':';
+                $firstSeparatorPos = strpos($user_ip_address, $separator);
+            }
+            $secondSeparatorPos = strpos($user_ip_address, $separator, $firstSeparatorPos + 1);
+
+            if ( $secondSeparatorPos !== false ) {
+                $userKey = "Limit-".$restriction["confNo"]."-".substr($user_ip_address, 0, $secondSeparatorPos );
+            } else {
+                $userKey = "Limit-".$restriction["confNo"]."-generic";
+            }
         }
 
         // Test for per ip limit
-        $limitReached = false;
-        if (!$redis->exists($userKey)) {
-            $redis->set($userKey, 1);
-            $redis->expire($userKey, $time_period);
-        } else {
-            if ($redis->INCR($userKey) > $max_calls_limit_ip) {
-                $limitReached = true;
-            }
-            // Reset expire if TTL = -1 ( no expiration ). This happens regularly for an unknown reason.
-            $redis->rawcommand("EXPIRE", $userKey, $time_period, "NX");
-        }
+        $limitReached = $this->incAndTestRequestCountForKey($userKey, $max_calls_limit_ip, $time_period);
 
         // Test for global limit if ip limit is not reached
         if ( $limitReached == false ) {
             $globalLimitKey = "Limit-".$restriction["confNo"]."-globalLimit";
-            if (!$redis->exists($globalLimitKey)) {
-                $redis->set($globalLimitKey, 1);
-                $redis->expire($globalLimitKey, $time_period);
-            } else {
-                if ($redis->INCR($globalLimitKey) > $max_calls_limit) {
-                    $limitReached = true;
-                }
-                $redis->rawcommand("EXPIRE", $globalLimitKey, $time_period, "NX"); // Reset expire if TTL = -1  
-            }
+            $limitReached = $this->incAndTestRequestCountForKey($globalLimitKey, $max_calls_limit, $time_period);
         }
 
+        // If limit is reached : return 429
         if ( $limitReached ) {
             $headers['Cache-Control'] = 'no-store';
             $headers['Retry-After'] = (string)($time_period * 2);

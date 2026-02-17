@@ -6,13 +6,13 @@
 
 # customcategory=page4=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:category.page4
 
-# customsubcategory=page5=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:category.page5
+# customcategory=page5=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:category.page5
 
 
 # cat=basic/enable/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.redis_server
 redisServer =
 
-# cat=basic/enable/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.redis_server_port
+# cat=basic/enable/; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.redis_server_port
 port = 6379
 
 # cat=basic/enable/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.ipExcludedFromRatelimit
