@@ -53,6 +53,13 @@ class LimitRequestRateForPage implements MiddlewareInterface
     protected int $redisPort;
 
     /**
+     * Treat all requests without a HTTP_REFERER header as a single user for rate limit.
+     * They will be restricted the same a single an IP address.
+     * @var boolean
+     */
+    protected bool $groupNoReferer = false;
+
+    /**
      * Addresses of clients not to limit
      * @var array
      */
@@ -79,6 +86,8 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $this->redisHost = $extConfig['redisServer'];
         $this->redisPort = $extConfig['port'];
         $this->ipExcludedFromRatelimit = explode(',', $extConfig['ipExcludedFromRatelimit']);
+        $this->groupNoReferer = (bool)$extConfig['groupNoRefererAsOneUser'] ?? false;
+
 
         if ( $this->redisHost && $this->redisPort > 0 && count($this->restrictedPages) > 0 ) {
             $this->isConfigured = true;
@@ -156,8 +165,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
         * OK, verifications are done, proceed with the actual limit logic
         ******/
 
-
-        if ( empty($params->getHttpReferer()) ) {
+        if ( $this->groupNoReferer && empty($params->getHttpReferer()) ) {
             // If there is no referer, consider it's a single user
             $userKey = "Limit-".$restriction["confNo"]."-noReferer";
         } else {

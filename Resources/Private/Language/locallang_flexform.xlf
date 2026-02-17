@@ -36,6 +36,9 @@
 			<trans-unit id="configuration.redis_server_port">
 				<source>Port of the redis server</source>
 			</trans-unit>
+			<trans-unit id="configuration.groupNoRefererAsOneUser">
+				<source>Treat all requests without a HTTP_REFERER header as a single user. : This "single user" will have the same limit as an IP group</source>
+			</trans-unit>
 			<trans-unit id="configuration.ipExcludedFromRatelimit">
 				<source>Comma separated list of IPs to exclude from all limits ( always allow ) : ex: 127.0.0.1</source>
 			</trans-unit>

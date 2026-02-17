@@ -41,6 +41,9 @@
 			<trans-unit id="configuration.redis_server_port" approved="yes">
 				<target state="final">Port du serveur redis</target>
 			</trans-unit>
+			<trans-unit id="configuration.groupNoRefererAsOneUser" approved="yes">
+				<source>Traiter toutes les requêtes sans entête HTTP_REFERER comme venant d'une seule personne : Elle sera limitée de la même façon qu'un groupe d'adresse IP</source>
+			</trans-unit>
 			<trans-unit id="configuration.ipExcludedFromRatelimit" approved="yes">
 				<target state="final">Adresses IP séparées par virgules à exclure de toute limitation ( toujours autoriser ) : ex: 127.0.0.1</target>
 			</trans-unit>
