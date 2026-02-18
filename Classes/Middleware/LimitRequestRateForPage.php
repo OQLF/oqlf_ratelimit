@@ -59,6 +59,14 @@ class LimitRequestRateForPage implements MiddlewareInterface
      */
     protected bool $groupNoReferer = false;
 
+
+    /**
+     * Does reaching a limit reset the timer ?
+     * If set, a user has to pause it's requests once limited or the limit will extend.
+     * @var boolean
+     */
+    protected bool $punitive = false;
+
     /**
      * Addresses of clients not to limit
      * @var array
@@ -87,6 +95,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $this->redisPort = $extConfig['port'];
         $this->ipExcludedFromRatelimit = explode(',', $extConfig['ipExcludedFromRatelimit']);
         $this->groupNoReferer = (bool)$extConfig['groupNoRefererAsOneUser'] ?? false;
+        $this->punitive = (bool)$extConfig['ipPunitiveLimit'] ?? false;
 
 
         if ( $this->redisHost && $this->redisPort > 0 && count($this->restrictedPages) > 0 ) {
@@ -101,9 +110,10 @@ class LimitRequestRateForPage implements MiddlewareInterface
      * @param  string $key      Key to increment
      * @param  int    $limit    Number of times allowed in $duration period
      * @param  int    $duration Time period in seconds a max of $limit hits are allowed
+     * @param  bool   $punitive Reset the timer if the limit is reached ?
      * @return bool             Is limit exceeded ?
      */
-    protected function incAndTestRequestCountForKey ( string $key, int $limit, int $duration ): bool {
+    protected function incAndTestRequestCountForKey ( string $key, int $limit, int $duration, bool $punitive = false ): bool {
         if (!$this->redisServer->exists($key)) {
             $this->redisServer->set($key, 1);
             $this->redisServer->expire($key, $duration);
@@ -112,6 +122,9 @@ class LimitRequestRateForPage implements MiddlewareInterface
             $this->redisServer->rawcommand("EXPIRE", $key, $duration, "NX");
 
             if ($this->redisServer->INCR($key) > $limit) {
+                if ( $punitive ) {
+                    $this->redisServer->expire($key, $duration);
+                }
                 return true;
             }
 
@@ -190,7 +203,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
         }
 
         // Test for per ip limit
-        $limitReached = $this->incAndTestRequestCountForKey($userKey, $max_calls_limit_ip, $time_period);
+        $limitReached = $this->incAndTestRequestCountForKey($userKey, $max_calls_limit_ip, $time_period, $this->punitive);
 
         // Test for global limit if ip limit is not reached
         if ( $limitReached == false ) {

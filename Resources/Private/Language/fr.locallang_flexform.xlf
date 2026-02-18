@@ -42,7 +42,10 @@
 				<target state="final">Port du serveur redis</target>
 			</trans-unit>
 			<trans-unit id="configuration.groupNoRefererAsOneUser" approved="yes">
-				<source>Traiter toutes les requêtes sans entête HTTP_REFERER comme venant d'une seule personne : Elle sera limitée de la même façon qu'un groupe d'adresse IP</source>
+				<target state="final">Traiter toutes les requêtes sans entête HTTP_REFERER comme venant d'une seule personne : Elle sera limitée de la même façon qu'un groupe d'adresse IP</target>
+			</trans-unit>
+			<trans-unit id="configuration.ipPunitiveLimit">
+				<target state="final">Est-ce qu'atteindre la limite par adresse IP réinitialise la période ? : Si activé, l'utilisateur devra cesser ses requêtes pour la période sinon celle-ci sera rallongée.</target>
 			</trans-unit>
 			<trans-unit id="configuration.ipExcludedFromRatelimit" approved="yes">
 				<target state="final">Adresses IP séparées par virgules à exclure de toute limitation ( toujours autoriser ) : ex: 127.0.0.1</target>
