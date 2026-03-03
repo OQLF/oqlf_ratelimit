@@ -141,6 +141,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
         }        
 
         $params = $request->getAttribute('normalizedParams');
+        $user_ip_address = $params->getRemoteAddress();
 
         // If client is in the list of IPs not to restrict, proceed
         if ( in_array($user_ip_address, $this->ipExcludedFromRatelimit) ) {
@@ -184,7 +185,6 @@ class LimitRequestRateForPage implements MiddlewareInterface
         } else {
             // The user is identified by the first 2 number of it's IP address
             // Typo3 handles HTTP_X_FORWARDED_FOR with reverse proxies in normalizedParams
-            $user_ip_address = $params->getRemoteAddress();
 
             $separator = '.';
             $firstSeparatorPos = strpos($user_ip_address, $separator);
