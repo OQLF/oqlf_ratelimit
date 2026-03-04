@@ -34,11 +34,13 @@ class LimitRequestRateForPage implements MiddlewareInterface
      */
     protected bool $isConfigured = false;
 
+
     /**
      * Pages configured for rate limiting
      * @var array
      */
     protected array $restrictedPages = [];
+
 
     /**
      * Redis server to use
@@ -46,11 +48,13 @@ class LimitRequestRateForPage implements MiddlewareInterface
      */
     protected string $redisHost;
 
+
     /**
      * Redis tcp port
      * @var int
      */
     protected int $redisPort;
+
 
     /**
      * Treat all requests without a HTTP_REFERER header as a single user for rate limit.
@@ -67,16 +71,27 @@ class LimitRequestRateForPage implements MiddlewareInterface
      */
     protected bool $punitive = false;
 
+
     /**
      * Addresses of clients not to limit
      * @var array
      */
     protected array $ipExcludedFromRatelimit = [];
 
+
     /**
      * Redis server object
+     * @var \Redis
      */
     protected \Redis $redisServer;
+
+
+    /**
+     * Message to show humans on the 429 page
+     * @var string
+     */
+    protected string $message429;
+
 
     public function __construct(
         private readonly ExtensionConfiguration $extensionConfiguration,
@@ -96,6 +111,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $this->ipExcludedFromRatelimit = explode(',', $extConfig['ipExcludedFromRatelimit']);
         $this->groupNoReferer = (bool)$extConfig['groupNoRefererAsOneUser'] ?? false;
         $this->punitive = (bool)$extConfig['ipPunitiveLimit'] ?? false;
+        $this->message429 = $extConfig['message429'] ?? "";
 
 
         if ( $this->redisHost && $this->redisPort > 0 && count($this->restrictedPages) > 0 ) {
@@ -215,7 +231,23 @@ class LimitRequestRateForPage implements MiddlewareInterface
         if ( $limitReached ) {
             $headers['Cache-Control'] = 'no-store';
             $headers['Retry-After'] = (string)($time_period * 2);
-            return new Response('php://temp', 429, $headers);
+            $headers['Refresh'] = (string)($time_period * 2);
+
+            $response = new Response('php://temp', 429, $headers);
+            $delai = str_repeat(".", $time_period * 2);
+            echo <<<REP
+                <!DOCTYPE html>
+                    <html>
+                    <body>
+                    <p>$this->message429<span id="delai">$delai</span></p>
+                    <script>
+                        delai=document.getElementById("delai");
+                        setInterval(function () {delai.innerText = delai.innerText.slice(0,-1);}, 1000);
+                    </script>
+                    </body>
+                </html>
+                REP;
+            return $response;
         }
 
         return $handler->handle($request);

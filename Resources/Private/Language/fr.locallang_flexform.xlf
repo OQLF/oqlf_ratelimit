@@ -50,6 +50,9 @@
 			<trans-unit id="configuration.ipExcludedFromRatelimit" approved="yes">
 				<target state="final">Adresses IP séparées par virgules à exclure de toute limitation ( toujours autoriser ) : ex: 127.0.0.1</target>
 			</trans-unit>
+			<trans-unit id="configuration.message429" approved="yes">
+				<target state="final">Message à afficher aux utilisateurs qui ont reçu un 429 : Ce sera suivi d'une série de points représentant les secondes restantes au délai.</target>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

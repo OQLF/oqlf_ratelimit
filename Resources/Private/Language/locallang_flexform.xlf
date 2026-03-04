@@ -45,6 +45,9 @@
 			<trans-unit id="configuration.ipExcludedFromRatelimit">
 				<source>Comma separated list of IPs to exclude from all limits ( always allow ) : ex: 127.0.0.1</source>
 			</trans-unit>
+			<trans-unit id="configuration.message429">
+				<source>Message to display to users receiving a 429 : It will be followed with a serie of dots representing the number of seconds remaining.</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

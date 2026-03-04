@@ -24,6 +24,9 @@ ipPunitiveLimit = 0
 # cat=basic/enable/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.ipExcludedFromRatelimit
 ipExcludedFromRatelimit = 127.0.0.1
 
+# cat=basic/enable/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.message429
+message429 = Please wait
+
 pages {
 	0 {
 		# cat=page1/links/; type=string; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.pageToLimit
