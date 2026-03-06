@@ -37,7 +37,10 @@
 				<source>Port of the redis server</source>
 			</trans-unit>
 			<trans-unit id="configuration.groupNoRefererAsOneUser">
-				<source>Treat all requests without a HTTP_REFERER header as a single user. : This "single user" will have the same limit as an IP group</source>
+				<source>Treat all requests without a HTTP_REFERER header as a single user. : This "single user" will have the same limit as an IP group.</source>
+			</trans-unit>
+			<trans-unit id="configuration.userGroupHeader">
+				<source>Treat all requests with this header present as a single user. : This "single user" will have the same limit as an IP group. The header is normally added by a firewall ou proxy in front of your Typo3 server.</source>
 			</trans-unit>
 			<trans-unit id="configuration.ipPunitiveLimit">
 				<source>Does reaching a per user limit reset the timer ? : If set, a user has to pause it's requests once limited or the limit will extend.</source>

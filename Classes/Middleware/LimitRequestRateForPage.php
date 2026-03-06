@@ -63,6 +63,11 @@ class LimitRequestRateForPage implements MiddlewareInterface
      */
     protected bool $groupNoReferer = false;
 
+    /**
+     * Request header whose presence identify a single user for rate-limiting purpose
+     * @var string
+     */
+    protected string $userGroupHeader;
 
     /**
      * Does reaching a limit reset the timer ?
@@ -110,8 +115,10 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $this->redisPort = $extConfig['port'];
         $this->ipExcludedFromRatelimit = explode(',', $extConfig['ipExcludedFromRatelimit']);
         $this->groupNoReferer = (bool)$extConfig['groupNoRefererAsOneUser'] ?? false;
+        $this->userGroupHeader = $extConfig['userGroupHeader'] ?? "";
         $this->punitive = (bool)$extConfig['ipPunitiveLimit'] ?? false;
         $this->message429 = $extConfig['message429'] ?? "";
+
 
 
         if ( $this->redisHost && $this->redisPort > 0 && count($this->restrictedPages) > 0 ) {
@@ -195,7 +202,9 @@ class LimitRequestRateForPage implements MiddlewareInterface
         * OK, verifications are done, proceed with the actual limit logic
         ******/
 
-        if ( $this->groupNoReferer && empty($params->getHttpReferer()) ) {
+        if ( $this->userGroupHeader && $request->hasHeader($this->userGroupHeader) ) {
+            $userKey = "Limit-".$restriction["confNo"]."-headerMatch";
+        } elseif ( $this->groupNoReferer && empty($params->getHttpReferer()) ) {
             // If there is no referer, consider it's a single user
             $userKey = "Limit-".$restriction["confNo"]."-noReferer";
         } else {
