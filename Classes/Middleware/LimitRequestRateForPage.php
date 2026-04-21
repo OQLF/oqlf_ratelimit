@@ -202,48 +202,65 @@ class LimitRequestRateForPage implements MiddlewareInterface
         * OK, verifications are done, proceed with the actual limit logic
         ******/
 
-        if ( $this->userGroupHeader && $request->hasHeader($this->userGroupHeader) ) {
-            $userKey = "Limit-".$restriction["confNo"]."-headerMatch";
-        } elseif ( $this->groupNoReferer && empty($params->getHttpReferer()) ) {
-            // If there is no referer, consider it's a single user
-            $userKey = "Limit-".$restriction["confNo"]."-noReferer";
-        } else {
-            // The user is identified by the first 2 number of it's IP address
-            // Typo3 handles HTTP_X_FORWARDED_FOR with reverse proxies in normalizedParams
+        // The user is identified by the first 2 number of it's IP address
+        // Typo3 handles HTTP_X_FORWARDED_FOR with reverse proxies in normalizedParams
 
-            $separator = '.';
+        $separator = '.';
+        $firstSeparatorPos = strpos($user_ip_address, $separator);
+        if ( $firstSeparatorPos === false ) {
+            // IPv6
+            $separator = ':';
             $firstSeparatorPos = strpos($user_ip_address, $separator);
-            if ( $firstSeparatorPos === false ) {
-                // IPv6
-                $separator = ':';
-                $firstSeparatorPos = strpos($user_ip_address, $separator);
-            }
-            $secondSeparatorPos = strpos($user_ip_address, $separator, $firstSeparatorPos + 1);
+        }
+        $secondSeparatorPos = strpos($user_ip_address, $separator, $firstSeparatorPos + 1);
 
-            if ( $secondSeparatorPos !== false ) {
-                $userKey = "Limit-".$restriction["confNo"]."-".substr($user_ip_address, 0, $secondSeparatorPos );
-            } else {
-                $userKey = "Limit-".$restriction["confNo"]."-generic";
-            }
+        if ( $secondSeparatorPos !== false ) {
+            $userKey = "Limit-".$restriction["confNo"]."-".substr($user_ip_address, 0, $secondSeparatorPos );
+        } else {
+            $userKey = "Limit-".$restriction["confNo"]."-generic";
         }
 
         // Test for per ip limit
-        $limitReached = $this->incAndTestRequestCountForKey($userKey, $max_calls_limit_ip, $time_period, $this->punitive);
+        $limitReached = $this->incAndTestRequestCountForKey(
+            $userKey,
+            $max_calls_limit_ip,
+            $time_period,
+            $this->punitive);
 
-        // Test for global limit if ip limit is not reached
-        if ( $limitReached == false ) {
-            $globalLimitKey = "Limit-".$restriction["confNo"]."-globalLimit";
-            $limitReached = $this->incAndTestRequestCountForKey($globalLimitKey, $max_calls_limit, $time_period);
+        // If IP limit is not reached, test for GroupHeader limit
+        if ( $limitReached == false && $this->userGroupHeader && $request->hasHeader($this->userGroupHeader) ) {
+            $limitReached = $this->incAndTestRequestCountForKey(
+                "Limit-".$restriction["confNo"]."-headerMatch",
+                $max_calls_limit_ip,
+                $time_period,
+                $this->punitive);
         }
 
-        // If limit is reached : return 429
+        // If no limit is reached yet, test for no_referer limit
+        if ( $limitReached == false && $this->groupNoReferer && empty($params->getHttpReferer()) ) {
+            $limitReached = $this->incAndTestRequestCountForKey(
+                "Limit-".$restriction["confNo"]."-noReferer",
+                $max_calls_limit_ip,
+                $time_period,
+                $this->punitive);
+        }
+
+        // Test for global limit if no other limit has been reached
+        if ( $limitReached == false ) {
+            $limitReached = $this->incAndTestRequestCountForKey(
+                "Limit-".$restriction["confNo"]."-globalLimit",
+                $max_calls_limit,
+                $time_period);
+        }
+
+        // If a limit is reached : return 429
         if ( $limitReached ) {
             $headers['Cache-Control'] = 'no-store';
             $headers['Retry-After'] = (string)($time_period * 2);
             $headers['Refresh'] = (string)($time_period * 2);
 
             $response = new Response('php://temp', 429, $headers);
-            $delai = str_repeat(".", $time_period * 2);
+            $delai = str_repeat("▄", $time_period * 4); // time_period * 2 / .5s
             echo <<<REP
                 <!DOCTYPE html>
                     <html>
@@ -251,7 +268,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
                     <p>$this->message429<span id="delai">$delai</span></p>
                     <script>
                         delai=document.getElementById("delai");
-                        setInterval(function () {delai.innerText = delai.innerText.slice(0,-1);}, 1000);
+                        setInterval(function () {delai.innerText = delai.innerText.slice(0,-1);}, 500);
                     </script>
                     </body>
                 </html>
