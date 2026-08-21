@@ -44,17 +44,19 @@
 			<trans-unit id="configuration.groupNoRefererAsOneUser" approved="yes">
 				<target state="final">Traiter toutes les requêtes sans entête HTTP_REFERER comme venant d'une seule personne : Elle sera limitée de la même façon qu'un groupe d'adresse IP</target>
 			</trans-unit>
-			<trans-unit id="configuration.userGroupHeader" approved="yes">
-				<target state="final">Traiter toutes les requêtes avec cet entête présent comme venant d'une seule personne : Elle sera limitée de la même façon qu'un groupe d'adresse IP. Cet entête est normalement ajouté par un pare-feu ou mandataire en amont de votre serveur Typo3.</target>
+			<trans-unit id="configuration.userGroupHeaders" approved="yes">
+				<target state="final">Traiter toutes les requêtes avec la même valeur pour ces entêtes comme venant d'une seule personne : Elle sera limitée de la même façon qu'un groupe d'adresse IP.
+				Ces entêtes sont normalement ajoutées par un pare-feu ou mandataire en amont de votre serveur Typo3.
+				Plusieurs entêtes séparées par des virgules peuvent être spécifiés.</target>
 			</trans-unit>
 			<trans-unit id="configuration.ipPunitiveLimit">
-				<target state="final">Est-ce qu'atteindre la limite par adresse IP réinitialise la période ? : Si activé, l'utilisateur devra cesser ses requêtes pour la période sinon celle-ci sera rallongée.</target>
+				<target state="final">Est-ce qu'atteindre de nouveau la limite par adresse IP réinitialise la période ? : Si activé, l'utilisateur devra cesser ses requêtes pour la période sinon celle-ci sera rallongée.</target>
 			</trans-unit>
 			<trans-unit id="configuration.ipExcludedFromRatelimit" approved="yes">
 				<target state="final">Adresses IP séparées par virgules à exclure de toute limitation ( toujours autoriser ) : ex: 127.0.0.1</target>
 			</trans-unit>
 			<trans-unit id="configuration.message429" approved="yes">
-				<target state="final">Message à afficher aux utilisateurs qui ont reçu un 429 : Ce sera suivi d'une série de points représentant les secondes restantes au délai.</target>
+				<target state="final">Message à afficher aux utilisateurs qui ont reçu un 429 : Ce sera suivi d'une barre de progression représentant les secondes restantes avant le raffraichissement de la page.</target>
 			</trans-unit>
 		</body>
 	</file>

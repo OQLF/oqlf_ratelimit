@@ -64,10 +64,10 @@ class LimitRequestRateForPage implements MiddlewareInterface
     protected bool $groupNoReferer = false;
 
     /**
-     * Request header whose presence identify a single user for rate-limiting purpose
-     * @var string
+     * Request headers whose value identify a single user for rate-limiting purpose. Comma separated.
+     * @var array<string>
      */
-    protected string $userGroupHeader;
+    protected array $userGroupHeaders;
 
     /**
      * Does reaching a limit reset the timer ?
@@ -115,7 +115,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $this->redisPort = $extConfig['port'];
         $this->ipExcludedFromRatelimit = explode(',', $extConfig['ipExcludedFromRatelimit']);
         $this->groupNoReferer = (bool)$extConfig['groupNoRefererAsOneUser'] ?? false;
-        $this->userGroupHeader = $extConfig['userGroupHeader'] ?? "";
+        $this->userGroupHeaders = array_filter(explode(',', $extConfig['userGroupHeaders'] ?? ""));
         $this->punitive = (bool)$extConfig['ipPunitiveLimit'] ?? false;
         $this->message429 = $extConfig['message429'] ?? "";
 
@@ -144,7 +144,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
             // Reset expire if TTL = -1 ( no expiration ). This happens regularly for an unknown reason.
             $this->redisServer->rawcommand("EXPIRE", $key, $duration, "NX");
 
-            if ($this->redisServer->INCR($key) > $limit) {
+            if ($this->redisServer->incr($key) > $limit) {
                 if ( $punitive ) {
                     $this->redisServer->expire($key, $duration);
                 }
@@ -215,9 +215,9 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $secondSeparatorPos = strpos($user_ip_address, $separator, $firstSeparatorPos + 1);
 
         if ( $secondSeparatorPos !== false ) {
-            $userKey = "Limit-".$restriction["confNo"]."-".substr($user_ip_address, 0, $secondSeparatorPos );
+            $userKey = "Limit-{$restriction['confNo']}".substr($user_ip_address, 0, $secondSeparatorPos );
         } else {
-            $userKey = "Limit-".$restriction["confNo"]."-generic";
+            $userKey = "Limit-{$restriction['confNo']}-generic";
         }
 
         // Test for per ip limit
@@ -227,19 +227,21 @@ class LimitRequestRateForPage implements MiddlewareInterface
             $time_period,
             $this->punitive);
 
-        // If IP limit is not reached, test for GroupHeader limit
-        if ( $limitReached == false && $this->userGroupHeader && $request->hasHeader($this->userGroupHeader) ) {
-            $limitReached = $this->incAndTestRequestCountForKey(
-                "Limit-".$restriction["confNo"]."-headerMatch",
-                $max_calls_limit_ip,
-                $time_period,
-                $this->punitive);
+        // If IP limit is not reached, test for each GroupHeaders limit
+        foreach($this->userGroupHeaders as $header) {
+            if ( $limitReached == false && $value = $request->getHeader($header) ) {
+                $limitReached = $this->incAndTestRequestCountForKey(
+                    "Limit-{$restriction['confNo']}-$header-$value",
+                    $max_calls_limit_ip,
+                    $time_period,
+                    $this->punitive);
+            }
         }
 
         // If no limit is reached yet, test for no_referer limit
         if ( $limitReached == false && $this->groupNoReferer && empty($params->getHttpReferer()) ) {
             $limitReached = $this->incAndTestRequestCountForKey(
-                "Limit-".$restriction["confNo"]."-noReferer",
+                "Limit-{$restriction['confNo']}-noReferer",
                 $max_calls_limit_ip,
                 $time_period,
                 $this->punitive);
@@ -248,13 +250,16 @@ class LimitRequestRateForPage implements MiddlewareInterface
         // Test for global limit if no other limit has been reached
         if ( $limitReached == false ) {
             $limitReached = $this->incAndTestRequestCountForKey(
-                "Limit-".$restriction["confNo"]."-globalLimit",
+                "Limit-{$restriction['confNo']}-globalLimit",
                 $max_calls_limit,
                 $time_period);
         }
 
         // If a limit is reached : return 429
         if ( $limitReached ) {
+            /**
+             * @var array Headers to return with the 429 reply
+             */
             $headers['Cache-Control'] = 'no-store';
             $headers['Retry-After'] = (string)($time_period * 2);
             $headers['Refresh'] = (string)($time_period * 2);

@@ -39,17 +39,19 @@
 			<trans-unit id="configuration.groupNoRefererAsOneUser">
 				<source>Treat all requests without a HTTP_REFERER header as a single user. : This "single user" will have the same limit as an IP group.</source>
 			</trans-unit>
-			<trans-unit id="configuration.userGroupHeader">
-				<source>Treat all requests with this header present as a single user. : This "single user" will have the same limit as an IP group. The header is normally added by a firewall ou proxy in front of your Typo3 server.</source>
+			<trans-unit id="configuration.userGroupHeaders">
+				<source>Treat all requests with the same value for these headers as a single user. : This "single user" will have the same limit as an IP group.
+				These headers are normally added by a firewall or proxy in front of your Typo3 server.
+				Multiple comma separated headers can be specified.</source>
 			</trans-unit>
 			<trans-unit id="configuration.ipPunitiveLimit">
-				<source>Does reaching a per user limit reset the timer ? : If set, a user has to pause it's requests once limited or the limit will extend.</source>
+				<source>Does reaching again a per user limit reset the timer ? : If set, a user has to pause it's requests once limited or the limit will extend.</source>
 			</trans-unit>
 			<trans-unit id="configuration.ipExcludedFromRatelimit">
 				<source>Comma separated list of IPs to exclude from all limits ( always allow ) : ex: 127.0.0.1</source>
 			</trans-unit>
 			<trans-unit id="configuration.message429">
-				<source>Message to display to users receiving a 429 : It will be followed with a serie of dots representing the number of seconds remaining.</source>
+				<source>Message to display to users receiving a 429 : It will be followed by a progress indicator representing the number of seconds remaining before the page refresh.</source>
 			</trans-unit>
 		</body>
 	</file>
