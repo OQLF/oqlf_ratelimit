@@ -15,6 +15,9 @@ redisServer =
 # cat=basic/enable/; type=int+; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.redis_server_port
 port = 6379
 
+# cat=basic/enable/; type=boolean; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.redis_server_persistent
+persistentConnection = 0
+
 # cat=basic/enable/; type=boolean; label=LLL:EXT:oqlf_ratelimit/Resources/Private/Language/locallang_flexform.xlf:configuration.groupNoRefererAsOneUser
 groupNoRefererAsOneUser = 0
 

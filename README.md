@@ -29,6 +29,10 @@ All configuration is done in the Settings->Extension configuration module.
 
 #### Redis server port
 
+#### Use a persistent connection
+
+Reuse the same connection if possible. Probably a good idea in high load setups.
+
 #### Treat all requests without a HTTP_REFERER header as a single user
 
 When this is checked, all requests without an HTTP_REFERER are treated as originating from a single user so IP group limit apply

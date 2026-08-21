@@ -34,6 +34,19 @@ class LimitRequestRateForPage implements MiddlewareInterface
      */
     protected bool $isConfigured = false;
 
+    /**
+     * Indicates whether the server is connected
+     *
+     * @var bool
+     */
+    protected bool $isConnected = false;
+
+    /**
+     * Persistent connection
+     *
+     * @var bool
+     */
+    protected $persistentConnection = false;
 
     /**
      * Pages configured for rate limiting
@@ -113,6 +126,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
 
         $this->redisHost = $extConfig['redisServer'];
         $this->redisPort = $extConfig['port'];
+        $this->persistentConnection = (bool)$extConfig['persistentConnection'] ?? false;
         $this->ipExcludedFromRatelimit = explode(',', $extConfig['ipExcludedFromRatelimit']);
         $this->groupNoReferer = (bool)$extConfig['groupNoRefererAsOneUser'] ?? false;
         $this->userGroupHeaders = array_filter(explode(',', $extConfig['userGroupHeaders'] ?? ""));
@@ -191,12 +205,22 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $max_calls_limit = (int)$restriction["max_calls_limit"];
 
         $this->redisServer = new \Redis();
-        if ( $this->redisServer->connect($this->redisHost, $this->redisPort) == false ) {
-            error_log("oqlf_ratelimit: Redis server could not be reached");
+        try {
+            if ($this->persistentConnection) {
+                $this->isConnected = $this->redisServer->pconnect($this->redisHost, $this->redisPort);
+            } else {
+                $this->isConnected = $this->redisServer->connect($this->redisHost, $this->redisPort);
+            }
+        } catch (\Exception $e) {
+            error_log("oqlf_ratelimit: Error (".$e->getMessage().")");
+        }
 
+        if ($this->isConnected == false) {
             // No Redis : proceed with the request without ratelimit
+            error_log("oqlf_ratelimit: Could not connect to the redis server");
             return $handler->handle($request);
         }
+
 
         /******
         * OK, verifications are done, proceed with the actual limit logic
