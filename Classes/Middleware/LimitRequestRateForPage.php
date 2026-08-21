@@ -215,7 +215,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
         $secondSeparatorPos = strpos($user_ip_address, $separator, $firstSeparatorPos + 1);
 
         if ( $secondSeparatorPos !== false ) {
-            $userKey = "Limit-{$restriction['confNo']}".substr($user_ip_address, 0, $secondSeparatorPos );
+            $userKey = "Limit-{$restriction['confNo']}-".substr($user_ip_address, 0, $secondSeparatorPos );
         } else {
             $userKey = "Limit-{$restriction['confNo']}-generic";
         }
@@ -231,7 +231,7 @@ class LimitRequestRateForPage implements MiddlewareInterface
         foreach($this->userGroupHeaders as $header) {
             if ( $limitReached == false && $value = $request->getHeader($header) ) {
                 $limitReached = $this->incAndTestRequestCountForKey(
-                    "Limit-{$restriction['confNo']}-$header-$value",
+                    "Limit-{$restriction['confNo']}-$header-{$value[0]}",
                     $max_calls_limit_ip,
                     $time_period,
                     $this->punitive);
